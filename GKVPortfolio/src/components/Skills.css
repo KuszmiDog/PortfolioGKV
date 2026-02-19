@@ -1,3 +1,7 @@
+/* ============================================
+   SKILLS COMPONENT
+   ============================================ */
+
 .skills-category {
     margin-bottom: var(--space-16);
 }
@@ -27,6 +31,26 @@
     padding: var(--space-8);
     text-align: center;
     min-height: 140px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradient shimmer overlay — hidden until in-view */
+.skill-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg,
+            transparent 0%,
+            rgba(99, 196, 241, 0.08) 40%,
+            rgba(92, 177, 246, 0.12) 50%,
+            rgba(99, 196, 241, 0.08) 60%,
+            transparent 100%);
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: none;
+    pointer-events: none;
+    border-radius: inherit;
 }
 
 .skill-icon {
@@ -45,4 +69,47 @@
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin: 0;
+}
+
+/* ============================================
+   SCROLL-TRIGGERED SLIDE + GRADIENT ANIMATION
+   ============================================ */
+
+/* Initial hidden state for all animated elements */
+.skill-animate {
+    opacity: 0;
+    transform: translateY(40px);
+    transition:
+        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--card-delay, var(--category-delay, 0ms));
+}
+
+/* Visible state when scrolled into view */
+.skill-animate.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Gradient shimmer sweep on cards once in view */
+.skill-animate.in-view.skill-card::before {
+    animation: gradientSweep 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--card-delay, 0ms);
+}
+
+@keyframes gradientSweep {
+    0% {
+        opacity: 1;
+        transform: translateX(-100%);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateX(100%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }

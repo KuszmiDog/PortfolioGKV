@@ -1,10 +1,75 @@
+import { useEffect, useRef, useState } from 'react';
 import { FiGithub, FiExternalLink, FiClock } from 'react-icons/fi';
 import './Projects.css';
-import equipoCalidoImg from '../assets/EquipoCalido.png';
-import julioCesarImg from '../assets/JulioCesar.png';
-import buenasViandasImg from '../assets/BuenasViandas.png';
+
+// Equipo Cálido images
+import EC1 from '../assets/equipocalido/EC1.png';
+import EC2 from '../assets/equipocalido/EC2.png';
+import EC3 from '../assets/equipocalido/EC3.png';
+
+// Julio César images
+import JC1 from '../assets/juliocesar/JC1.png';
+import JC2 from '../assets/juliocesar/JC2.png';
+import JC3 from '../assets/juliocesar/JC3.png';
+
+// Buenas Viandas images
+import BV1 from '../assets/buenavianda/BV1.png';
+import BV2 from '../assets/buenavianda/BV2.png';
+import BV3 from '../assets/buenavianda/BV3.png';
+
+const CROSSFADE_INTERVAL = 4000; // ms between image transitions
+
+const ProjectImageCarousel = ({ images, alt }) => {
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    useEffect(() => {
+        if (images.length <= 1) return;
+
+        const timer = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % images.length);
+        }, CROSSFADE_INTERVAL);
+
+        return () => clearInterval(timer);
+    }, [images.length]);
+
+    return (
+        <div className="project-image-container">
+            {images.map((src, index) => (
+                <img
+                    key={index}
+                    src={src}
+                    alt={`${alt} - ${index + 1}`}
+                    className={`project-image ${index === activeIndex ? 'active' : ''}`}
+                />
+            ))}
+        </div>
+    );
+};
 
 const Projects = () => {
+    const sectionRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-view');
+                    }
+                });
+            },
+            { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+        );
+
+        const section = sectionRef.current;
+        if (section) {
+            const animatedElements = section.querySelectorAll('.project-animate');
+            animatedElements.forEach((el) => observer.observe(el));
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
     const mapacheProjects = [
         {
             name: 'Equipo Cálido',
@@ -12,7 +77,7 @@ const Projects = () => {
             role: 'Desarrollo Full Stack - DevOps',
             tech: ['React', 'Node.js', 'Firebase'],
             github: 'https://github.com/tiagou0/Equipo-Calido',
-            image: equipoCalidoImg,
+            images: [EC1, EC2, EC3],
         },
         {
             name: 'Julio César Web',
@@ -20,7 +85,7 @@ const Projects = () => {
             role: 'Desarrollo Backend',
             tech: ['React', 'Node.js', 'Express', 'Firebase'],
             github: 'https://github.com/tiagou0/juliocesarweb',
-            image: julioCesarImg,
+            images: [JC1, JC2, JC3],
         },
         {
             name: 'Buenas Viandas – Software Chico',
@@ -28,28 +93,29 @@ const Projects = () => {
             role: 'Desarrollo Full Stack',
             tech: ['React', 'Node.js', 'Express', 'Firebase'],
             github: 'https://github.com/tiagou0/buenas-viandas-softwarechico',
-            image: buenasViandasImg,
+            images: [BV1, BV2, BV3],
         },
     ];
 
     return (
-        <section id="projects" className="section projects-section">
+        <section id="projects" className="section projects-section" ref={sectionRef}>
             <div className="container">
-                <h2 className="section-title slide-up">Proyectos</h2>
+                <h2 className="section-title project-animate">Proyectos</h2>
 
                 {/* mApache Projects */}
                 <div className="projects-subsection">
-                    <h3 className="subsection-title">Proyectos mApache</h3>
+                    <h3 className="subsection-title project-animate" style={{ '--project-delay': '100ms' }}>Proyectos mApache</h3>
                     <div className="projects-grid">
                         {mapacheProjects.map((project, index) => (
-                            <div key={project.name} className={`project-card glass-card slide-up stagger-${(index % 3) + 1}`}>
-                                <div className="project-image-container">
-                                    <img
-                                        src={project.image}
-                                        alt={project.name}
-                                        className="project-image"
-                                    />
-                                </div>
+                            <div
+                                key={project.name}
+                                className="project-card glass-card project-animate"
+                                style={{ '--project-delay': `${(index + 1) * 200}ms` }}
+                            >
+                                <ProjectImageCarousel
+                                    images={project.images}
+                                    alt={project.name}
+                                />
 
                                 <div className="project-header">
                                     <h4 className="project-name">{project.name}</h4>
@@ -94,8 +160,8 @@ const Projects = () => {
 
                 {/* Personal Projects Teaser */}
                 <div className="projects-subsection">
-                    <h3 className="subsection-title">Proyectos Propios</h3>
-                    <div className="teaser-card glass-card slide-up">
+                    <h3 className="subsection-title project-animate" style={{ '--project-delay': '100ms' }}>Proyectos Propios</h3>
+                    <div className="teaser-card glass-card project-animate" style={{ '--project-delay': '250ms' }}>
                         <div className="teaser-icon">
                             <FiClock size={48} />
                         </div>
